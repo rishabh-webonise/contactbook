@@ -6,6 +6,7 @@ import './App.css';
 import { AddContact } from './components/AddContact';
 import { ContactList } from './components/ContactList';
 import { Header } from './components/Header';
+import { Login } from './components/Login';
 import api from './api/contacts';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -47,12 +48,16 @@ function App() {
     <ErrorBoundary>
       <Router>
         <div className="ui container">
-          <Header />
           <Switch>
             <Route exact path="/">
+              <Login />
+            </Route>
+            <Route exact path="/list">
+              <Header />
               <ContactList contacts={contacts} onDelete={onDelete} onEdit={onEdit} />
             </Route>
             <Route exact path="/add">
+              <Header />
               <AddContact onAdd={onAdd} />
             </Route>
           </Switch>
