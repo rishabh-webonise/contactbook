@@ -1,44 +1,64 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { uuid } from 'uuidv4'
+
 import './App.css';
 import { AddContact } from './components/AddContact';
 import { ContactList } from './components/ContactList';
 import { Header } from './components/Header';
+import api from './api/contacts';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
-  let intialContacts = []
-  if (localStorage.getItem('contacts') !== null) intialContacts = JSON.parse(localStorage.getItem('contacts'))
+  const [contacts, setContacts] = useState([])
 
-  const [contacts, setContacts] = useState(intialContacts)
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts))
-  }, [contacts])
-
-  const onAdd = (contact) => {
-    contact.id = uuid()
-    console.log(contact);
-    setContacts([...contacts, contact])
+  const fetchContacts = async () => {
+    const response = await api.get('/contacts')
+    return response.data
   }
 
-  const onDelete = (contact) => {
-    setContacts(contacts.filter((e) => e !== contact))
+  useEffect(() => {
+    const getAllContacts = async () => {
+      const allContacts = await fetchContacts()
+      if (allContacts) setContacts(allContacts)
+    }
+    getAllContacts()
+  }, [])
+
+  useEffect(() => { }, [contacts])
+
+  const onAdd = async (contact) => {
+    contact.id = uuid()
+    console.log(contact);
+    const response = await api.post('/contacts', contact)
+    setContacts([...contacts, response.data])
+  }
+
+  const onDelete = async (contact) => {
+    await api.delete('/contacts/' + contact.id)
+    setContacts(contacts.filter((e) => e.id !== contact.id))
+  }
+
+  const onEdit = async (contact) => {
+    console.log(contact);
   }
 
   return (
-    <Router>
-      <div className="ui container">
-        <Header />
-        <Switch>
-          <Route exact path="/">
-            <AddContact onAdd={onAdd} />
-          </Route>
-          <Route exact path="/list">
-            <ContactList contacts={contacts} onDelete={onDelete} />
-          </Route>
-        </Switch>
-      </div>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <div className="ui container">
+          <Header />
+          <Switch>
+            <Route exact path="/">
+              <ContactList contacts={contacts} onDelete={onDelete} onEdit={onEdit} />
+            </Route>
+            <Route exact path="/add">
+              <AddContact onAdd={onAdd} />
+            </Route>
+          </Switch>
+        </div>
+      </Router>
+    </ErrorBoundary>
     // <div className="App"><header className="App-header">
     // </header></div>
   );
