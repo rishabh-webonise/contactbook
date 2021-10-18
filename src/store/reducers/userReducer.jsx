@@ -1,3 +1,5 @@
+import { LOGIN, REGISTER } from "../type"
+
 const initialState = {
     email: 'rishabh@gmail.com',
     password: 'rishabh123',
@@ -6,8 +8,8 @@ const initialState = {
 
 export const userReducer = (state = initialState, action) => {
     switch (action.type) {
-        case 'LOGIN':
-        case 'REGISTER':
+        case LOGIN:
+        case REGISTER:
         default: return state
     }
 }

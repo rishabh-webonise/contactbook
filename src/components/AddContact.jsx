@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { uuid } from 'uuidv4'
 
 export const AddContact = ({ onAdd }) => {
     const [name, setName] = useState('')
@@ -10,12 +11,13 @@ export const AddContact = ({ onAdd }) => {
             alert('Please fill both the fields')
         } else {
             //TODO: generate from uuid
+            setName('')
+            setPhone('')
             onAdd({
+                id: uuid(),
                 name: name,
                 phone: phone
             })
-            setName('')
-            setPhone('')
         }
     }
 
